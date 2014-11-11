@@ -26,6 +26,12 @@ DateTimePickerDate = React.createClass({
     addDecade: React.PropTypes.func.isRequired,
     subtractDecade: React.PropTypes.func.isRequired,
     shouldDayBeDisabled: React.PropTypes.func,
+    disableSwitchView: React.PropTypes.bool,
+  },
+  getDefaultProps: function() {
+    return {
+      disableSwitchView: true,
+    };
   },
   getInitialState: function() {
     return {
@@ -35,6 +41,11 @@ DateTimePickerDate = React.createClass({
     };
   },
   showMonths: function() {
+
+    if (this.props.disableSwitchView) {
+        return this.getInitialState();
+    }
+
     return this.setState({
       daysDisplayed: false,
       monthsDisplayed: true
