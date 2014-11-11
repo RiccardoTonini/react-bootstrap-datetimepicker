@@ -1,4 +1,3 @@
-
 /** @jsx React.DOM */
 var DateTimePickerDays, React, moment;
 
@@ -15,12 +14,21 @@ DateTimePickerDays = React.createClass({
     showToday: React.PropTypes.bool,
     daysOfWeekDisabled: React.PropTypes.array,
     setSelectedDate: React.PropTypes.func.isRequired,
-    showMonths: React.PropTypes.func.isRequired
+    showMonths: React.PropTypes.func.isRequired,
+    shouldDayBeDisabled: React.PropTypes.func,
   },
   getDefaultProps: function() {
     return {
       showToday: true
     };
+  },
+  shouldDayBeDisabled: function (selected_date) {
+
+    var selected_date = selected_date || this.state.selectedDate,
+        today = moment(),
+        moment_date = moment(selected_date, this.props.inputFormat);
+
+      return moment_date.isBefore(today, 'day');
   },
   renderDays: function() {
     var cells, classes, days, html, i, month, nextMonth, prevMonth, row, year, _i, _len, _ref;
@@ -53,6 +61,7 @@ DateTimePickerDays = React.createClass({
           classes['today'] = true;
         }
       }
+
       if (this.props.daysOfWeekDisabled) {
         _ref = this.props.daysOfWeekDisabled;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -63,9 +72,14 @@ DateTimePickerDays = React.createClass({
           }
         }
       }
-      cells.push(<td className={React.addons.classSet(classes)} onClick={this.props.setSelectedDate}>{prevMonth.date()}</td>);
+
+      if (this.props.shouldDayBeDisabled && this.shouldDayBeDisabled(prevMonth)) {
+          classes['disabled'] = true;
+      }
+
+      cells.push(React.DOM.td( {className:React.addons.classSet(classes), onClick:this.props.setSelectedDate}, prevMonth.date()));
       if (prevMonth.weekday() === moment().endOf('week').weekday()) {
-        row = <tr>{cells}</tr>;
+        row = React.DOM.tr(null, cells);
         html.push(row);
         cells = [];
       }
@@ -75,39 +89,39 @@ DateTimePickerDays = React.createClass({
   },
   render: function() {
     return (
-    <div className="datepicker-days" style={{display: 'block'}}>
-        <table className="table-condensed">
-          <thead>
-            <tr>
-              <th className="prev" onClick={this.props.subtractMonth}>‹</th>
+    React.DOM.div( {className:"datepicker-days", style:{display: 'block'}},
+        React.DOM.table( {className:"table-condensed"},
+          React.DOM.thead(null,
+            React.DOM.tr(null,
+              React.DOM.th( {className:"prev", onClick:this.props.subtractMonth}, "‹"),
 
-              <th className="switch" colSpan="5" onClick={this.props.showMonths}>{moment.months()[this.props.viewDate.month()]} {this.props.viewDate.year()}</th>
+              React.DOM.th( {className:"switch", colSpan:"5", onClick:this.props.showMonths}, moment.months()[this.props.viewDate.month()], this.props.viewDate.year()),
 
-              <th className="next" onClick={this.props.addMonth}>›</th>
-            </tr>
+              React.DOM.th( {className:"next", onClick:this.props.addMonth}, "›")
+            ),
 
-            <tr>
-              <th className="dow">Su</th>
+            React.DOM.tr(null,
+              React.DOM.th( {className:"dow"}, "Su"),
 
-              <th className="dow">Mo</th>
+              React.DOM.th( {className:"dow"}, "Mo"),
 
-              <th className="dow">Tu</th>
+              React.DOM.th( {className:"dow"}, "Tu"),
 
-              <th className="dow">We</th>
+              React.DOM.th( {className:"dow"}, "We"),
 
-              <th className="dow">Th</th>
+              React.DOM.th( {className:"dow"}, "Th"),
 
-              <th className="dow">Fr</th>
+              React.DOM.th( {className:"dow"}, "Fr"),
 
-              <th className="dow">Sa</th>
-            </tr>
-          </thead>
+              React.DOM.th( {className:"dow"}, "Sa")
+            )
+          ),
 
-          <tbody>
-            {this.renderDays()}
-          </tbody>
-        </table>
-      </div>
+          React.DOM.tbody(null,
+            this.renderDays()
+          )
+        )
+      )
     );
   }
 });
